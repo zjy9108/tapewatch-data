@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.json">
+<title>动量策略</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior-y:contain}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC",sans-serif;
+background:#0b1220;color:#e8eef7;line-height:1.55;-webkit-font-smoothing:antialiased}
+
+.hd{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.92);
+backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+padding:calc(env(safe-area-inset-top) + 12px) 16px 10px;border-bottom:1px solid #1c2942;
+display:flex;justify-content:space-between;align-items:center}
+.hd h1{font-size:16px;font-weight:600;letter-spacing:.3px}
+.hd .st{font-size:11px;color:#5b6b85;margin-top:1px}
+.refresh{width:34px;height:34px;border-radius:50%;background:#16233a;border:1px solid #22304d;
+display:flex;align-items:center;justify-content:center;font-size:15px;color:#7d8ca6}
+.refresh:active{background:#1d2d48;transform:scale(.94)}
+
+main{padding:14px 14px calc(env(safe-area-inset-bottom) + 74px);max-width:760px;margin:0 auto}
+.page{display:none}
+.page.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.card{background:#131f35;border:1px solid #1e2d47;border-radius:16px;padding:15px;margin-bottom:12px}
+.card-t{font-size:12px;color:#6b7c96;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+
+.mk{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.mk .px{font-size:30px;font-weight:600;letter-spacing:-.5px;line-height:1.15}
+.mk .sub{font-size:11px;color:#5b6b85;margin-top:3px}
+.bg{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.bg.bull{background:rgba(190,60,60,.16);color:#ff8f8f;border:1px solid rgba(190,60,60,.35)}
+.bg.bear{background:rgba(45,160,90,.14);color:#6ee7a0;border:1px solid rgba(45,160,90,.32)}
+.bg.range{background:rgba(200,150,40,.14);color:#f2c368;border:1px solid rgba(200,150,40,.32)}
+
+.g4{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:4px}
+.kv{background:#0f1a2c;border-radius:11px;padding:11px 12px}
+.kv .k{font-size:10.5px;color:#5b6b85;letter-spacing:.2px}
+.kv .v{font-size:16px;font-weight:600;margin-top:2px;letter-spacing:-.2px}
+
+.posw{display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px}
+.posw .l{font-size:12px;color:#6b7c96}
+.posw .r{font-size:20px;font-weight:600}
+.bar{height:7px;background:#1a273e;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#2f6df6,#5a9bff);
+transition:width .4s ease}
+
+.pitem{display:flex;justify-content:space-between;align-items:center;padding:13px 0;
+border-bottom:1px solid #1a2740}
+.pitem:last-child{border-bottom:none}
+.pitem .nm{font-size:14.5px;font-weight:600}
+.pitem .cd{font-size:11px;color:#5b6b85;margin-top:1px}
+.pitem .rt{text-align:right}
+.pitem .pl{font-size:16px;font-weight:600;letter-spacing:-.3px}
+.pitem .px2{font-size:11px;color:#6b7c96;margin-top:1px}
+.up{color:#ff6b6b}.down{color:#4ade80}.flat{color:#8b9bb4}
+
+.tg{display:inline-block;font-size:10px;padding:1.5px 7px;border-radius:5px;background:#1c2b45;
+color:#7d8ca6;margin-left:5px;vertical-align:1px}
+.tg.h{background:rgba(47,109,246,.22);color:#8ab4ff}
+
+.crow{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid #1a2740}
+.crow:last-child{border-bottom:none}
+.crow .rk{width:24px;font-size:12px;color:#4a5a75;font-variant-numeric:tabular-nums}
+.crow .rk.top{color:#ffb347;font-weight:600}
+.crow .mid{flex:1;min-width:0}
+.crow .nm{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .cd{font-size:10.5px;color:#4a5a75;margin-top:1px}
+.crow .num{text-align:right;font-variant-numeric:tabular-nums}
+.crow .m{font-size:14px;font-weight:600}
+.crow .v2{font-size:10.5px;color:#5b6b85;margin-top:1px}
+
+.empty{text-align:center;color:#3d4d66;font-size:13px;padding:28px 0}
+.note{font-size:11px;color:#4a5a75;line-height:1.7;margin-top:10px}
+.note b{color:#6b7c96;font-weight:500}
+
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;
+background:rgba(11,18,32,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+border-top:1px solid #1c2942;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar a{flex:1;text-align:center;padding:9px 0 7px;color:#4a5a75;font-size:10px;
+text-decoration:none;transition:color .15s}
+.tabbar a .ic{display:block;font-size:17px;margin-bottom:1px;line-height:1.2}
+.tabbar a.on{color:#5a9bff}
+
+.err{background:rgba(190,60,60,.12);border:1px solid rgba(190,60,60,.3);color:#ff9b9b;
+border-radius:12px;padding:12px;font-size:12.5px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <div>
+    <h1>动量策略</h1>
+    <div class="st" id="upd">连接中…</div>
+  </div>
+  <div class="refresh" id="rf">↻</div>
+</div>
+
+<main>
+  <div id="errbox"></div>
+
+  <section class="page on" id="p-ov">
+    <div class="card">
+      <div class="mk">
+        <div>
+          <div class="px" id="mkpx">—</div>
+          <div class="sub" id="mksub">中证500ETF 510500</div>
+        </div>
+        <div class="bg range" id="mkbg">—</div>
+      </div>
+      <div class="g4">
+        <div class="kv"><div class="k">MA20 / MA60</div><div class="v" id="kvma">—</div></div>
+        <div class="kv"><div class="k">波动率分位</div><div class="v" id="kvq">—</div></div>
+        <div class="kv"><div class="k">距60日高点</div><div class="v" id="kvdd">—</div></div>
+        <div class="kv"><div class="k">目标持仓</div><div class="v" id="kvn">—</div></div>
+      </div>
+      <div class="posw">
+        <span class="l">建议总仓位</span>
+        <span class="r" id="posn">—</span>
+      </div>
+      <div class="bar"><i id="posb" style="width:0%"></i></div>
+      <div class="note" id="mknote"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><span>今日操作</span></div>
+      <div id="actbox"><div class="empty">无操作</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><span>策略规则速查</span></div>
+      <div class="note">
+        <b>选股</b>　90日波动率 20–60% 分位 + 20日动量排序<br>
+        <b>风格</b>　价值/成长/周期/防御，每类最多 1 只<br>
+        <b>调仓</b>　每月一次，最多换 2 只，缓冲 100 名<br>
+        <b>风控</b>　止盈 +50% / 止损 −15%<br>
+        <b>仓位</b>　牛 6 只 / 震荡 4 只 / 熊 2 只<br>
+        <b>现金</b>　闲置买国债ETF 511010
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="p-pos">
+    <div class="card">
+      <div class="card-t"><span>当前持仓</span><span id="pcnt"></span></div>
+      <div id="posbox"><div class="empty">暂无持仓</div></div>
+    </div>
+    <div class="card">
+      <div class="card-t"><span>风控价位</span></div>
+      <div id="riskbox"><div class="empty">暂无</div></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-cd">
+    <div class="card">
+      <div class="card-t"><span>候选池</span><span>按20日动量排序</span></div>
+      <div id="candbox"><div class="empty">暂无候选</div></div>
+    </div>
+    <div class="card">
+      <div class="card-t"><span>说明</span></div>
+      <div class="note">
+        候选池是「按规则此刻会选出」的名单。实际调仓受每月最多换 2 只限制，
+        不代表全部买入。带「持仓」标记的是已经持有的。
+      </div>
+    </div>
+  </section>
+  <section class="page" id="p-set">
+    <div class="card">
+      <div class="card-t"><span>总资金</span><span id="cap-hint">用于计算占比与可买数量</span></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="cap" type="number" inputmode="decimal" step="100"
+               style="flex:1;background:#0f1a2c;border:1px solid #22304d;border-radius:10px;
+                      padding:12px 14px;color:#e8eef7;font-size:18px;font-weight:600;
+                      font-variant-numeric:tabular-nums;outline:none">
+        <span style="color:#6b7c96;font-size:13px">元</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><span>持仓明细</span><span id="pset-count">0 只</span></div>
+      <div id="pset-list"></div>
+      <button id="add-pos"
+              style="width:100%;margin-top:12px;padding:11px;background:#16233a;
+                     border:1px dashed #2b3d5c;border-radius:10px;color:#7d8ca6;
+                     font-size:13px">+ 添加一只</button>
+    </div>
+
+    <div class="card">
+      <div class="card-t"><span>资金概览</span><span>实时计算</span></div>
+      <div id="calc-box"></div>
+    </div>
+
+    <button id="save-btn"
+            style="width:100%;padding:14px;background:#2f6df6;border:none;border-radius:12px;
+                   color:#fff;font-size:15px;font-weight:600;margin-bottom:10px">保存设置</button>
+    <div class="note" style="text-align:center">保存后写入本地状态文件，看板与推送立即生效</div>
+  </section>
+</main>
+
+<nav class="tabbar">
+  <a href="#ov" class="on" data-p="p-ov"><span class="ic">◎</span>概览</a>
+  <a href="#pos" data-p="p-pos"><span class="ic">▦</span>持仓</a>
+  <a href="#cd" data-p="p-cd"><span class="ic">≡</span>候选</a>
+  <a href="#set" data-p="p-set"><span class="ic">⚙</span>设置</a>
+</nav>
+
+<script>
+var D=null, LAST=0;
+function $(id){return document.getElementById(id)}
+function fmtPx(v){return (v===null||v===undefined||isNaN(v))?'—':Number(v).toFixed(2)}
+function pct(v,d){d=d===undefined?1:d;return (v>=0?'+':'')+Number(v).toFixed(d)}
+function cls(v){return v>0?'up':(v<0?'down':'flat')}
+
+function tab(){
+  var h=(location.hash||'#ov').slice(1);
+  var m={'ov':'p-ov','pos':'p-pos','cd':'p-cd','set':'p-set'};
+  if(!m[h]) h='ov';
+  for(var k in m){$(m[k]).classList.toggle('on', m[k]===m[h]);}
+  var as=document.querySelectorAll('.tabbar a');
+  for(var i=0;i<as.length;i++){as[i].classList.toggle('on', as[i].getAttribute('data-p')===m[h]);}
+  window.scrollTo(0,0);
+}
+
+function render(d){
+  D=d; LAST=Date.now();
+  var m=d.market||{};
+  $('upd').textContent='更新 '+(d.updated||'').slice(5,16);
+  $('mkpx').textContent=fmtPx(m.px).replace(/^—$/, '—');
+  $('mksub').textContent='中证500ETF 510500　MA60 '+(m.ma60||0).toFixed(3);
+  var bg=$('mkbg');
+  bg.textContent = m.state==='bull'?'牛市':(m.state==='bear'?'熊市':'震荡');
+  bg.className='bg '+(m.state||'range');
+  $('kvma').textContent=fmtPx(m.ma20)+' / '+fmtPx(m.ma60);
+  $('kvq').textContent=(m.vol_q||0)+'%';
+  var dd=$('kvdd'); dd.textContent=pct(m.dd60||0,1)+'%';
+  dd.className='v '+cls(m.dd60);
+  var nm={'bull':6,'range':4,'bear':2}[m.state]||4;
+  $('kvn').textContent=nm+' 只';
+  var p=Math.min(100,(m.adj||0)*100);
+  $('posn').textContent=p.toFixed(0)+'%';
+  $('posb').style.width=p+'%';
+  $('mknote').textContent=m.note||'';
+
+  // 持仓
+  var pos=d.positions||[];
+  $('pcnt').textContent=pos.length+' 只';
+  var h='';
+  if(!pos.length){h='<div class="empty">暂无持仓</div>'}
+  else{
+    pos.forEach(function(x){
+      h+='<div class="pitem"><div><div class="nm">'+(x.name||x.code)+
+      '<span class="tg">'+(x.style||'')+'</span></div><div class="cd">'+x.code+
+      '　成本 '+fmtPx(x.entry)+'</div></div>'+
+      '<div class="rt"><div class="pl '+cls(x.pnl)+'">'+pct(x.pnl,1)+'%</div>'+
+      '<div class="px2">现价 '+fmtPx(x.last)+'</div></div></div>';
+    });
+  }
+  $('posbox').innerHTML=h;
+
+  // 风控价位
+  var r='';
+  if(!pos.length){r='<div class="empty">暂无</div>'}
+  else{
+    pos.forEach(function(x){
+      r+='<div class="pitem"><div><div class="nm">'+(x.name||x.code)+'</div>'+
+      '<div class="cd">'+x.code+'</div></div>'+
+      '<div class="rt"><div class="px2">止损 <b class="down">'+x.stop.toFixed(2)+'</b>'+
+      '　止盈 <b class="up">'+x.tp.toFixed(2)+'</b></div></div></div>';
+    });
+  }
+  $('riskbox').innerHTML=r;
+
+  // 候选
+  var cd=(d.candidates||[]);
+  var c='';
+  if(!cd.length){c='<div class="empty">暂无候选</div>'}
+  else{
+    cd.forEach(function(x){
+      c+='<div class="crow"><div class="rk'+(x.rank<=3?' top':'')+'">'+x.rank+'</div>'+
+      '<div class="mid"><div class="nm">'+(x.name||x.code)+
+      (x.held?'<span class="tg h">持仓</span>':'')+
+      '<span class="tg">'+(x.style||'')+'</span></div>'+
+      '<div class="cd">'+x.code+'　价 '+fmtPx(x.px)+'　波动 '+fmtPx(x.vol)+'%</div></div>'+
+      '<div class="num"><div class="m '+cls(x.mom)+'">'+pct(x.mom,1)+'%</div>'+
+      '<div class="v2">20日动量</div></div></div>';
+    });
+  }
+  $('candbox').innerHTML=c;
+  $('errbox').innerHTML='';
+}
+
+function load(quiet){
+  if(!quiet){$('upd').textContent='刷新中…';}
+  fetch('result.json?_='+Date.now(),{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+    .then(function(d){render(d); $('upd').textContent='数据 '+(d.updated||'').slice(5,16);})
+    .catch(function(e){
+      $('errbox').innerHTML='<div class="err">数据加载失败：'+e.message+'</div>';
+      $('upd').textContent='加载失败';
+    });
+}
+
+$('rf').onclick=function(){load(false)};
+window.addEventListener('hashchange',tab);
+tab(); load(true); loadSet();
+setInterval(function(){
+  if(document.visibilityState==='visible' && Date.now()-LAST>45000) load(true);
+},15000);
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible') load(true);
+});
+/* ============ 设置页 ============ */
+var SET={capital:20000, positions:[]};
+
+function fmtMoney(v){return Number(v||0).toLocaleString('zh-CN',{maximumFractionDigits:0})}
+
+function renderSet(){
+  document.getElementById('cap').value = SET.capital;
+  var list=document.getElementById('pset-list');
+  document.getElementById('pset-count').textContent = SET.positions.length + ' 只';
+  if(!SET.positions.length){
+    list.innerHTML='<div class="empty">还没有登记持仓，点下面加一只</div>';
+  }else{
+    var h='';
+    SET.positions.forEach(function(p,i){
+      h+='<div style="background:#0f1a2c;border-radius:11px;padding:12px;margin-bottom:9px">'+
+         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px">'+
+           '<input data-f="code" data-i="'+i+'" type="text" inputmode="numeric" maxlength="6" '+
+             'placeholder="输入6位代码" value="'+p.code+'" '+
+             'style="flex:1;background:#16233a;border:1px solid #22304d;border-radius:8px;'+
+             'padding:8px 10px;color:#e8eef7;font-size:14px;font-weight:600;outline:none">'+
+           '<span style="font-size:13px;color:#8ab4ff;white-space:nowrap">'+(p.name||'')+'</span>'+
+           '<button data-del="'+i+'" style="background:none;border:none;color:#a0565c;font-size:12px;white-space:nowrap">删除</button>'+
+         '</div>'+
+         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+           '<label style="font-size:10.5px;color:#5b6b85">成本价（元）'+
+             '<input data-f="entry" data-i="'+i+'" type="number" step="0.01" inputmode="decimal" value="'+p.entry+'" '+
+             'style="width:100%;margin-top:3px;background:#16233a;border:1px solid #22304d;border-radius:8px;'+
+             'padding:8px 10px;color:#e8eef7;font-size:14px;outline:none"></label>'+
+           '<label style="font-size:10.5px;color:#5b6b85">股数'+
+             '<input data-f="shares" data-i="'+i+'" type="number" step="100" inputmode="numeric" value="'+p.shares+'" '+
+             'style="width:100%;margin-top:3px;background:#16233a;border:1px solid #22304d;border-radius:8px;'+
+             'padding:8px 10px;color:#e8eef7;font-size:14px;outline:none"></label>'+
+         '</div>'+
+         '<div style="margin-top:7px;font-size:11px;color:#6b7c96" data-sum="'+i+'"></div>'+
+       '</div>';
+    });
+    list.innerHTML=h;
+  }
+  bindSet();
+  calcSet();
+}
+
+function bindSet(){
+  document.querySelectorAll('[data-f]').forEach(function(el){
+    el.oninput=function(){
+      var i=+el.getAttribute('data-i'), f=el.getAttribute('data-f');
+      if(f==='code'){
+        SET.positions[i].code=(el.value||'').replace(/\D/g,'').slice(0,6);
+        if(SET.positions[i].code.length===6){
+          fetch('/api/name?code='+SET.positions[i].code)
+            .then(function(r){return r.json()})
+            .then(function(j){
+              if(j.name){
+                SET.positions[i].name=j.name;
+                var nm=$('pset-list').querySelectorAll('[data-f="code"]')[i]
+                         .parentNode.querySelector('span');
+                if(nm) nm.textContent=j.name;
+              }
+            }).catch(function(){});
+        }
+        return;
+      }
+      SET.positions[i][f]=parseFloat(el.value)||0;
+      calcSet();
+    };
+  });
+  document.querySelectorAll('[data-del]').forEach(function(b){
+    b.onclick=function(){
+      SET.positions.splice(+b.getAttribute('data-del'),1);
+      renderSet();
+    };
+  });
+}
+
+function calcSet(){
+  var cap=parseFloat(document.getElementById('cap').value)||0;
+  SET.capital=cap;
+  var mv=0;
+  SET.positions.forEach(function(p,i){
+    var m=(p.entry||0)*(p.shares||0);
+    mv+=m;
+    var cell=document.querySelector('[data-sum="'+i+'"]');
+    if(cell){
+      var pct=cap>0?(m/cap*100):0;
+      cell.innerHTML='市值 <b style="color:#cbd5e1">'+fmtMoney(m)+'</b> 元'+
+        '　占 <b style="color:'+(pct>20?'#f2c368':'#8ab4ff')+'">'+(isNaN(pct)?'—':pct.toFixed(1))+'%</b>';
+    }
+  });
+  var cash=Math.max(0,cap-mv);
+  var cashPct=cap>0?(cash/cap*100):0;
+  document.getElementById('calc-box').innerHTML=
+    '<div class="row"><span class="k">总资金</span><span class="v">'+fmtMoney(cap)+' 元</span></div>'+
+    '<div class="row"><span class="k">持仓市值（按成本）</span><span class="v">'+fmtMoney(mv)+' 元</span></div>'+
+    '<div class="row"><span class="k">可用现金</span><span class="v" style="color:#6ee7a0">'+fmtMoney(cash)+' 元</span></div>'+
+    '<div class="row"><span class="k">当前仓位</span><span class="v">'+(100-cashPct).toFixed(1)+'%</span></div>';
+  var bar=document.getElementById('posb');
+  if(bar) bar.style.width=Math.min(100,100-cashPct)+'%';
+}
+
+document.getElementById('cap').oninput=calcSet;
+document.getElementById('add-pos').onclick=function(){
+  SET.positions.push({code:'',name:'',entry:0,shares:0,date:new Date().toISOString().slice(0,10)});
+  renderSet();
+};
+document.getElementById('save-btn').onclick=function(){
+  var btn=this;
+  btn.textContent='保存中…'; btn.disabled=true;
+  var bad=SET.positions.filter(function(p){return !/^\d{6}$/.test(p.code)});
+  if(bad.length){
+    alert('有 '+bad.length+' 只股票的代码不是 6 位数字，请检查');
+    btn.textContent='保存设置'; btn.disabled=false; return;
+  }
+  fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(SET)})
+    .then(function(r){return r.json()})
+    .then(function(j){
+      if(j.ok){
+        btn.textContent='已保存 ✓';
+        SET=j.data; renderSet(); load(true);
+        setTimeout(function(){btn.textContent='保存设置';btn.disabled=false;},1500);
+      }else{
+        alert('保存失败：'+(j.error||'未知错误'));
+        btn.textContent='保存设置'; btn.disabled=false;
+      }
+    })
+    .catch(function(e){
+      alert('保存失败：'+e.message);
+      btn.textContent='保存设置'; btn.disabled=false;
+    });
+};
+
+function loadSet(){
+  fetch('/api/settings?_='+Date.now(),{cache:'no-store'})
+    .then(function(r){return r.json()})
+    .then(function(d){SET=d; renderSet();})
+    .catch(function(){renderSet();});
+}
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>

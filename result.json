@@ -1,0 +1,18 @@
+{
+  "updated": "2026-11-04 17:05:48",
+  "market": {
+    "state": "bear",
+    "px": 6.661,
+    "ma20": 6.789,
+    "ma60": 7.471,
+    "vol_q": 92.0,
+    "dd60": -18.7,
+    "adj": 0.04,
+    "date": "2026-11-04"
+  },
+  "positions": [],
+  "candidates": [],
+  "capital": 20000.0,
+  "pool_size": 592,
+  "selected": 0
+}
