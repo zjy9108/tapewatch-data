@@ -583,6 +583,8 @@ function ghFetch(url, opts, retries){
         // 返回的不是 JSON（很可能是运营商劫持或网络错误页）
         throw {_retryable:true, msg:'网络返回异常（可能被拦截），请换 WiFi/移动数据重试'};
       }
+      // 写操作只要状态码正常就算成功，不解析响应（避免被劫持的 HTML 崩溃）
+      if((opts.method === 'PUT' || opts.method === 'POST') && r.ok) return {ok:true};
       if(r.status === 401) throw {msg:'Token 无效或已过期，请重新生成'};
       if(r.status === 403) throw {msg:'Token 权限不足（需勾选 repo 和 workflow）'};
       if(r.status === 404) return {_notfound:true};
