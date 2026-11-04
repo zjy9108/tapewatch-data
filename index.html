@@ -327,10 +327,31 @@ function render(d){
   $('errbox').innerHTML='';
 }
 
+function mergeCloudPositions(d){
+  if(!(window.GH && GH.ok)) return Promise.resolve(d);
+  return loadCloudState().then(function(cs){
+    if(cs && cs.positions && cs.positions.length){
+      d.positions = cs.positions.map(function(p){
+        var entry = p.entry || 0, last = p.last || entry;
+        var old = (d.positions||[]).find(function(x){return x.code===p.code;}) || {};
+        return {code:p.code, name:p.name||NAMES[p.code]||p.code, entry:entry,
+                shares:p.shares, last:last,
+                pnl: entry>0 ? +(((last/entry)-1)*100).toFixed(1) : 0,
+                style: old.style||'',
+                stop: entry>0 ? +(entry*0.85).toFixed(2) : null,
+                tp: entry>0 ? +(entry*1.5).toFixed(2) : null};
+      });
+      d.capital = cs.capital;
+    }
+    return d;
+  }).catch(function(){ return d; });
+}
+
 function load(quiet){
   if(!quiet){$('upd').textContent='刷新中…';}
   fetch('result.json?_='+Date.now(),{cache:'no-store'})
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+    .then(function(d){ return mergeCloudPositions(d); })
     .then(function(d){render(d); $('upd').textContent='数据 '+(d.updated||'').slice(5,16);})
     .catch(function(e){ $('errbox').innerHTML='<div class="err">数据加载失败：'+e.message+'</div>'; });
 }
