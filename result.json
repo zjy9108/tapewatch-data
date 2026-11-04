@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-04 17:05:48",
+  "updated": "2026-11-05 01:40:10",
   "market": {
     "state": "bear",
     "px": 6.661,
@@ -8,11 +8,76 @@
     "vol_q": 92.0,
     "dd60": -18.7,
     "adj": 0.04,
-    "date": "2026-11-04"
+    "date": "2026-11-04",
+    "note": "510500 6.661  MA20 6.789  MA60 7.471  波动分位 92%  距60日高 -18.7%"
   },
-  "positions": [],
-  "candidates": [],
+  "positions": [
+    {
+      "code": "000530",
+      "name": "冰山冷热",
+      "entry": 8.6,
+      "shares": 200,
+      "last": 8.6,
+      "pnl": 0.0,
+      "style": "周期",
+      "stop": 7.31,
+      "tp": 12.9
+    },
+    {
+      "code": "002086",
+      "name": "东方海洋",
+      "entry": 3.42,
+      "shares": 500,
+      "last": 3.42,
+      "pnl": 0.0,
+      "style": "防御",
+      "stop": 2.91,
+      "tp": 5.13
+    }
+  ],
+  "candidates": [
+    {
+      "code": "000530",
+      "name": "冰山冷热",
+      "rank": 4,
+      "px": 8.6,
+      "mom": 65.1,
+      "vol": 3.83,
+      "style": "周期",
+      "held": true
+    },
+    {
+      "code": "002086",
+      "name": "东方海洋",
+      "rank": 2,
+      "px": 3.42,
+      "mom": 71.0,
+      "vol": 3.7,
+      "style": "防御",
+      "held": true
+    },
+    {
+      "code": "000995",
+      "name": "皇台酒业",
+      "rank": 6,
+      "px": 17.16,
+      "mom": 52.1,
+      "vol": 3.93,
+      "style": "其他",
+      "held": false
+    },
+    {
+      "code": "600715",
+      "name": "文投控股",
+      "rank": 7,
+      "px": 2.46,
+      "mom": 49.1,
+      "vol": 3.96,
+      "style": "成长",
+      "held": false
+    }
+  ],
   "capital": 20000.0,
-  "pool_size": 592,
-  "selected": 0
+  "pool_size": 590,
+  "selected": 4
 }
