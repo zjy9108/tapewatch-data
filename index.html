@@ -135,6 +135,12 @@ border-radius:12px;padding:12px;font-size:12.5px;margin-bottom:12px}
       <div id="actbox"><div class="empty">无操作</div></div>
     </div>
 
+    <button id="btn-update"
+            style="width:100%;padding:13px;background:#16233a;border:1px solid #2b3d5c;
+                   border-radius:12px;color:#8ab4ff;font-size:14px;margin-bottom:12px">
+      立即更新云端数据
+    </button>
+
     <div class="card">
       <div class="card-t"><span>策略规则速查</span></div>
       <div class="note">
@@ -198,10 +204,29 @@ border-radius:12px;padding:12px;font-size:12.5px;margin-bottom:12px}
       <div id="calc-box"></div>
     </div>
 
+    <div class="card">
+      <div class="card-t"><span>云端连接</span><span id="gh-status">未连接</span></div>
+      <div class="note" style="margin:0 0 8px">连接后可以：立即更新云端数据、同步持仓到云端</div>
+      <input id="gh-token" type="password" placeholder="粘贴 GitHub Token (ghp_...)"
+             style="width:100%;background:#0f1a2c;border:1px solid #22304d;border-radius:10px;
+                    padding:11px 13px;color:#e8eef7;font-size:13px;outline:none;margin-bottom:8px">
+      <div style="display:flex;gap:8px">
+        <button id="gh-connect" style="flex:1;padding:11px;background:#1c2b45;border:1px solid #2b3d5c;
+                border-radius:10px;color:#8ab4ff;font-size:13px">连接</button>
+        <button id="gh-disconnect" style="flex:1;padding:11px;background:#1c2b45;border:1px solid #2b3d5c;
+                border-radius:10px;color:#7d8ca6;font-size:13px">断开</button>
+      </div>
+      <div id="gh-expiry" class="note" style="margin-top:6px"></div>
+      <div id="gh-msg" class="note" style="margin-top:4px"></div>
+    </div>
+
     <button id="save-btn"
             style="width:100%;padding:14px;background:#2f6df6;border:none;border-radius:12px;
                    color:#fff;font-size:15px;font-weight:600;margin-bottom:10px">保存设置</button>
-    <div class="note" style="text-align:center">保存后写入本地状态文件，看板与推送立即生效</div>
+    <button id="sync-btn"
+            style="width:100%;padding:12px;background:#1c2b45;border:1px solid #2b3d5c;border-radius:12px;
+                   color:#8ab4ff;font-size:14px;margin-bottom:10px">同步持仓到云端并更新</button>
+    <div class="note" style="text-align:center">本地保存只改本机；「同步到云端」才会改 GitHub 上的持仓</div>
   </section>
 </main>
 
@@ -213,7 +238,9 @@ border-radius:12px;padding:12px;font-size:12.5px;margin-bottom:12px}
 </nav>
 
 <script>
-var D=null, LAST=0;
+var D=null, LAST=0, NAMES={};
+window.__NAMES__={"600715": "文投控股", "000530": "冰山冷热", "603369": "今世缘", "600838": "上海九百", "301079": "邵阳液压", "002086": "东方海洋", "002242": "九阳股份", "603337": "杰克科技", "001219": "青岛食品", "000995": "皇台酒业", "600558": "大西洋", "000001": "平安银行", "000021": "深科技", "000063": "中兴通讯", "000066": "中国长城", "000100": "TCL科技", "000333": "美的集团", "000338": "潍柴动力", "000400": "许继电气", "000415": "渤海租赁", "000425": "徐工机械", "000426": "兴业银锡", "000538": "云南白药", "000547": "航天发展", "000559": "万向钱潮", "000568": "泸州老窖", "000592": "平潭发展", "000596": "古井贡酒", "000603": "盛达资源", "000630": "铜陵有色", "000636": "风华高科", "000651": "格力电器", "000657": "中钨高新", "000676": "智度股份", "000678": "襄阳轴承", "000700": "模塑科技", "000701": "厦门信达", "000703": "恒逸石化", "000725": "京东方Ａ", "000768": "中航西飞", "000776": "广发证券", "000783": "长江证券", "000792": "盐湖股份", "000807": "云铝股份", "000811": "冰轮环境", "000823": "超声电子", "000831": "中国稀土", "000858": "五 粮 液", "000933": "神火股份", "000938": "紫光股份", "000960": "锡业股份", "000962": "东方钽业", "000963": "华东医药", "000975": "山金国际", "000977": "浪潮信息", "000988": "华工科技", "001216": "华瓷股份", "001270": "铖昌科技", "001287": "中电港", "001309": "德明利", "001317": "三羊马", "001318": "阳光乳业", "001330": "博纳影业", "001339": "智微智能", "001389": "广合科技", "001400": "江顺科技", "001979": "招商蛇口", "002001": "新 和 成", "002008": "大族激光", "002009": "天奇股份", "002025": "航天电器", "002027": "分众传媒", "002028": "思源电气", "002031": "巨轮智能", "002046": "国机精工", "002048": "宁波华翔", "002049": "紫光国微", "002050": "三花智控", "002074": "国轩高科", "002080": "中材科技", "002126": "银轮股份", "002129": "TCL中环", "002131": "利欧股份", "002138": "顺络电子", "002142": "宁波银行", "002149": "西部材料", "002155": "湖南黄金", "002156": "通富微电", "002164": "宁波东力", "002167": "东方锆业", "002172": "澳洋健康", "002173": "创新医疗", "002179": "中航光电", "002181": "粤 传 媒", "002185": "华天科技", "002195": "岩山科技", "002196": "方正电机", "002202": "金风科技", "002212": "天融信", "002222": "福晶科技", "002230": "科大讯飞", "002241": "歌尔股份", "002245": "蔚蓝锂芯", "002249": "大洋电机", "002265": "建设工业", "002271": "东方雨虹", "002273": "水晶光电", "002281": "光迅科技", "002292": "奥飞娱乐", "002297": "博云新材", "002300": "太阳电缆", "002304": "洋河股份", "002311": "海大集团", "002317": "众生药业", "002342": "巨力索具", "002343": "慈文传媒", "002347": "泰尔股份", "002352": "顺丰控股", "002353": "杰瑞股份", "002354": "天娱数科", "002361": "神剑股份", "002371": "北方华创", "002376": "新北洋", "002384": "东山精密", "002396": "星网锐捷", "002407": "多氟多", "002409": "雅克科技", "002413": "雷科防务", "002415": "海康威视", "002421": "达实智能", "002422": "科伦药业", "002428": "云南锗业", "002430": "杭氧股份", "002432": "九安医疗", "002434": "万里扬", "002436": "兴森科技", "002437": "誉衡药业", "002439": "启明星辰", "002456": "欧菲光", "002460": "赣锋锂业", "002463": "沪电股份", "002465": "海格通信", "002466": "天齐锂业", "002472": "双环传动", "002475": "立讯精密", "002484": "江海股份", "002487": "大金重工", "002491": "通鼎互联", "002517": "恺英网络", "002531": "天顺风能", "002532": "天山铝业", "002536": "飞龙股份", "002552": "宝鼎科技", "002555": "三七互娱", "002558": "巨人网络", "002565": "顺灏股份", "002579": "中京电子", "002580": "圣阳股份", "002582": "好想你", "002594": "比亚迪", "002600": "领益智造", "002602": "世纪华通", "002624": "完美世界", "002636": "金安国纪", "002639": "雪人集团", "002655": "共达电声", "002683": "广东宏大", "002696": "百洋股份", "002703": "浙江世宝", "002708": "光洋股份", "002709": "天赐材料", "002714": "牧原股份", "002716": "湖南白银", "002724": "海洋王", "002736": "国信证券", "002738": "中矿资源", "002741": "光华科技", "002745": "木林森", "002747": "埃斯顿", "002792": "通宇通讯", "002812": "恩捷股份", "002815": "崇达技术", "002821": "凯莱英", "002837": "英维克", "002842": "翔鹭钨业", "002850": "科达利", "002851": "麦格米特", "002859": "洁美科技", "002865": "钧达股份", "002913": "奥士康", "002916": "深南电路", "002929": "润建股份", "002931": "锋龙股份", "002938": "鹏鼎控股", "002943": "宇晶股份", "002945": "华林证券", "002958": "青农商行", "002966": "苏州银行", "002975": "博杰股份", "002979": "雷赛智能", "002980": "华盛昌", "003006": "百亚股份", "003021": "兆威机电", "003816": "中国广核", "300006": "莱美药业", "300007": "汉威科技", "300014": "亿纬锂能", "300015": "爱尔眼科", "300017": "网宿科技", "300031": "宝通科技", "300033": "同花顺", "300037": "新宙邦", "300045": "华力创通", "300054": "鼎龙股份", "300058": "蓝色光标", "300059": "东方财富", "300083": "创世纪", "300085": "银之杰", "300102": "乾照光电", "300115": "长盈精密", "300122": "智飞生物", "300124": "汇川技术", "300131": "英唐智控", "300133": "华策影视", "300136": "信维通信", "300139": "晓程科技", "300142": "沃森生物", "300149": "睿智医药", "300164": "通源石油", "300170": "汉得信息", "300177": "中海达", "300179": "四方达", "300182": "捷成股份", "300199": "翰宇药业", "300207": "欣旺达", "300209": "行云科技", "300223": "君正股份", "300224": "正海磁材", "300244": "迪安诊断", "300251": "光线传媒", "300255": "常山药业", "300260": "新莱应材", "300274": "阳光电源", "300285": "国瓷材料", "300291": "百纳千成", "300296": "利亚德", "300300": "海峡创新", "300307": "慈星股份", "300308": "中际旭创", "300315": "掌趣科技", "300319": "麦捷科技", "300339": "润和软件", "300342": "天银机电", "300346": "南大光电", "300347": "泰格医药", "300363": "博腾股份", "300364": "中文在线", "300369": "绿盟科技", "300373": "扬杰科技", "300378": "鼎捷数智", "300390": "天华新能", "300394": "天孚通信", "300395": "菲利华", "300398": "飞凯材料", "300404": "博济医药", "300408": "三环集团", "300413": "芒果超媒", "300418": "昆仑万维", "300420": "五洋自控", "300432": "富临精工", "300433": "蓝思科技", "300438": "鹏辉能源", "300442": "润泽科技", "300450": "先导智能", "300454": "深信服", "300456": "赛微电子", "300458": "全志科技", "300459": "汤姆猫", "300461": "田中精机", "300473": "德尔股份", "300474": "景嘉微", "300475": "香农芯创", "300476": "胜宏科技", "300489": "光智科技", "300496": "中科创达", "300502": "新易盛", "300503": "昊志机电", "300516": "久之洋", "300548": "长芯博创", "300567": "精测电子", "300570": "太辰光", "300604": "长川科技", "300607": "拓斯达", "300613": "富瀚微", "300620": "光库科技", "300661": "圣邦股份", "300666": "江丰电子", "300671": "富满微", "300672": "国科微", "300677": "英科医疗", "300679": "电连技术", "300684": "中石科技", "300718": "长盛轴承", "300725": "药石科技", "300739": "明阳电路", "300740": "水羊股份", "300747": "锐科激光", "300750": "宁德时代", "300751": "迈为股份", "300757": "罗博特科", "300759": "康龙化成", "300760": "迈瑞医疗", "300762": "上海瀚讯", "300765": "石药创新", "300769": "德方纳米", "300782": "卓胜微", "300803": "指南针", "300806": "斯迪克", "300811": "铂科新材", "300821": "东岳硅材", "300829": "金丹科技", "300839": "博汇股份", "300850": "新强联", "300852": "四会富仕", "300857": "协创数据", "300862": "蓝盾光电", "300866": "安克创新", "300870": "欧陆通", "300900": "广联航空", "300903": "科翔股份", "300953": "震裕科技", "300975": "商络电子", "300976": "达瑞电子", "300980": "祥源新材", "300990": "同飞股份", "301005": "超捷股份", "301015": "百洋医药", "301018": "申菱环境", "301047": "义翘神州", "301052": "果麦文化", "301071": "力量钻石", "301080": "百普赛斯", "301132": "满坤科技", "301165": "锐捷网络", "301171": "易点天下", "301183": "东田微", "301196": "唯科科技", "301205": "联特科技", "301217": "铜冠铜箔", "301218": "华是科技", "301230": "泓博医药", "301232": "飞沃科技", "301236": "软通动力", "301251": "威尔高", "301261": "恒工精密", "301269": "华大九天", "301282": "金禄电子", "301293": "三博脑科", "301306": "西测测试", "301308": "江波龙", "301313": "凡拓数创", "301358": "湖南裕能", "301363": "美好医疗", "301377": "鼎泰高科", "301396": "宏景科技", "301413": "安培龙", "301428": "世纪恒通", "301486": "致尚科技", "301487": "盟固利", "301511": "德福科技", "301520": "万邦医药", "301526": "国际复材", "301529": "福赛科技", "301536": "星宸科技", "301550": "斯菱智驱", "301563": "云汉芯城", "301626": "苏州天脉", "302132": "中航成飞", "600000": "浦发银行", "600016": "民生银行", "600018": "上港集团", "600026": "中远海能", "600028": "中国石化", "600030": "中信证券", "600031": "三一重工", "600036": "招商银行", "600048": "保利发展", "600050": "中国联通", "600060": "海信视像", "600089": "特变电工", "600104": "上汽集团", "600105": "永鼎股份", "600110": "诺德股份", "600111": "北方稀土", "600118": "中国卫星", "600127": "金健米业", "600150": "中国船舶", "600172": "黄河旋风", "600176": "中国巨石", "600183": "生益科技", "600186": "XD莲花控", "600188": "兖矿能源", "600206": "有研新材", "600246": "万通发展", "600256": "广汇能源", "600258": "首旅酒店", "600267": "海正药业", "600276": "恒瑞医药", "600293": "三峡新材", "600298": "安琪酵母", "600309": "万华化学", "600330": "天通股份", "600353": "旭光电子", "600362": "江西铜业", "600378": "昊华科技", "600406": "国电南瑞", "600415": "小商品城", "600418": "江淮汽车", "600428": "中远海特", "600460": "士兰微", "600487": "亨通光电", "600489": "中金黄金", "600498": "烽火通信", "600501": "航天晨光", "600519": "贵州茅台", "600521": "华海药业", "600522": "中天科技", "600547": "山东黄金", "600549": "厦门钨业", "600580": "卧龙电驱", "600584": "长电科技", "600592": "龙溪股份", "600601": "方正科技", "600637": "东方明珠", "600641": "先导基电", "600664": "哈药股份", "600667": "太极实业", "600673": "东阳光", "600688": "上海石化", "600690": "海尔智家", "600693": "东百集团", "600699": "均胜电子", "600703": "三安光电", "600711": "盛屯矿业", "600721": "百花医药", "600728": "佳都科技", "600737": "中粮糖业", "600760": "中航沈飞", "600763": "通策医疗", "600795": "国电电力", "600809": "山西汾酒", "600839": "四川长虹", "600863": "华能蒙电", "600869": "远东股份", "600875": "东方电气", "600879": "航天电子", "600885": "宏发股份", "600887": "伊利股份", "600893": "航发动力", "600900": "长江电力", "600909": "华安证券", "600919": "江苏银行", "600926": "杭州银行", "600938": "中国海油", "600941": "中国移动", "600967": "内蒙一机", "600988": "赤峰黄金", "600989": "宝丰能源", "600999": "招商证券", "601009": "南京银行", "601012": "隆基绿能", "601077": "渝农商行", "601086": "国芳集团", "601088": "中国神华", "601100": "恒立液压", "601117": "中国化学", "601127": "赛力斯", "601138": "工业富联", "601166": "兴业银行", "601168": "西部矿业", "601169": "北京银行", "601179": "中国西电", "601188": "龙江交通", "601208": "东材科技", "601211": "国泰海通", "601212": "白银有色", "601225": "陕西煤业", "601229": "上海银行", "601231": "环旭电子", "601288": "农业银行", "601318": "中国平安", "601328": "交通银行", "601336": "新华保险", "601360": "三六零", "601398": "工商银行", "601519": "大智慧", "601579": "会稽山", "601600": "中国铝业", "601601": "中国太保", "601606": "长城军工", "601628": "中国人寿", "601658": "邮储银行", "601665": "齐鲁银行", "601668": "中国建筑", "601688": "华泰证券", "601689": "拓普集团", "601698": "中国卫通", "601717": "中创智领", "601728": "中国电信", "601766": "中国中车", "601816": "京沪高铁", "601818": "光大银行", "601838": "成都银行", "601857": "中国石油", "601868": "中国能建", "601869": "长飞光纤", "601872": "招商轮船", "601888": "中国中免", "601899": "紫金矿业", "601919": "中远海控", "601939": "建设银行", "601975": "招商南油", "601985": "中国核电", "601988": "中国银行", "601991": "大唐发电", "601995": "中金公司", "603002": "宏昌电子", "603005": "晶方科技", "603019": "中科曙光", "603039": "泛微网络", "603061": "金海通", "603067": "振华股份", "603068": "博通集成", "603083": "剑桥科技", "603087": "甘李药业", "603119": "浙江荣泰", "603127": "昭衍新药", "603160": "汇顶科技", "603179": "新泉股份", "603186": "华正新材", "603200": "上海洗霸", "603228": "景旺电子", "603236": "移远通信", "603256": "宏和科技", "603259": "药明康德", "603268": "松发股份", "603278": "大业股份", "603288": "海天味业", "603296": "华勤技术", "603306": "华懋科技", "603308": "应流股份", "603330": "天洋新材", "603345": "安井食品", "603366": "日出东方", "603466": "风语筑", "603501": "豪威集团", "603528": "多伦科技", "603533": "掌阅科技", "603538": "美诺华", "603601": "再升科技", "603606": "东方电缆", "603618": "杭电股份", "603626": "科森科技", "603629": "利通电子", "603662": "柯力传感", "603663": "三祥新材", "603667": "五洲新春", "603683": "晶华新材", "603728": "鸣志电器", "603738": "泰晶科技", "603773": "沃格光电", "603799": "华友钴业", "603859": "能科科技", "603893": "瑞芯微", "603920": "世运电路", "603936": "博敏电子", "603986": "兆易创新", "603993": "洛阳钼业", "605006": "山东玻纤", "605058": "澳弘电子", "605111": "新洁能", "605117": "德业股份", "605118": "力鼎光电", "605179": "一鸣食品", "605287": "德才股份", "605358": "立昂微", "605376": "博迁新材", "605488": "福莱新材", "605499": "东鹏饮料", "605589": "圣泉集团", "605598": "上海港湾"};
+for(var k in window.__NAMES__){NAMES[k]=window.__NAMES__[k];}
 function $(id){return document.getElementById(id)}
 function fmtPx(v){return (v===null||v===undefined||isNaN(v))?'—':Number(v).toFixed(2)}
 function pct(v,d){d=d===undefined?1:d;return (v>=0?'+':'')+Number(v).toFixed(d)}
@@ -256,7 +283,7 @@ function render(d){
   if(!pos.length){h='<div class="empty">暂无持仓</div>'}
   else{
     pos.forEach(function(x){
-      h+='<div class="pitem"><div><div class="nm">'+(x.name||x.code)+
+      h+='<div class="pitem"><div><div class="nm">'+(x.name||NAMES[x.code]||x.code)+
       '<span class="tg">'+(x.style||'')+'</span></div><div class="cd">'+x.code+
       '　成本 '+fmtPx(x.entry)+'</div></div>'+
       '<div class="rt"><div class="pl '+cls(x.pnl)+'">'+pct(x.pnl,1)+'%</div>'+
@@ -270,10 +297,10 @@ function render(d){
   if(!pos.length){r='<div class="empty">暂无</div>'}
   else{
     pos.forEach(function(x){
-      r+='<div class="pitem"><div><div class="nm">'+(x.name||x.code)+'</div>'+
+      r+='<div class="pitem"><div><div class="nm">'+(x.name||NAMES[x.code]||x.code)+'</div>'+
       '<div class="cd">'+x.code+'</div></div>'+
-      '<div class="rt"><div class="px2">止损 <b class="down">'+x.stop.toFixed(2)+'</b>'+
-      '　止盈 <b class="up">'+x.tp.toFixed(2)+'</b></div></div></div>';
+      '<div class="rt"><div class="px2">止损 <b class="down">'+fmtPx(x.stop)+'</b>'+
+      '　止盈 <b class="up">'+fmtPx(x.tp)+'</b></div></div></div>';
     });
   }
   $('riskbox').innerHTML=r;
@@ -285,12 +312,15 @@ function render(d){
   else{
     cd.forEach(function(x){
       c+='<div class="crow"><div class="rk'+(x.rank<=3?' top':'')+'">'+x.rank+'</div>'+
-      '<div class="mid"><div class="nm">'+(x.name||x.code)+
+      '<div class="mid"><div class="nm">'+(x.name||NAMES[x.code]||x.code)+
       (x.held?'<span class="tg h">持仓</span>':'')+
       '<span class="tg">'+(x.style||'')+'</span></div>'+
       '<div class="cd">'+x.code+'　价 '+fmtPx(x.px)+'　波动 '+fmtPx(x.vol)+'%</div></div>'+
       '<div class="num"><div class="m '+cls(x.mom)+'">'+pct(x.mom,1)+'%</div>'+
-      '<div class="v2">20日动量</div></div></div>';
+      '<div class="v2">20日动量</div></div>'+
+      '<button data-buy="'+x.code+'" data-px="'+x.px+'" '+
+      'style="margin-left:8px;padding:6px 10px;background:#1c2b45;border:1px solid #2b3d5c;'+
+      'border-radius:7px;color:#8ab4ff;font-size:11px;white-space:nowrap">买入</button></div>';
     });
   }
   $('candbox').innerHTML=c;
@@ -304,12 +334,12 @@ function load(quiet){
     .then(function(d){render(d); $('upd').textContent='数据 '+(d.updated||'').slice(5,16);})
     .catch(function(e){
       $('errbox').innerHTML='<div class="err">数据加载失败：'+e.message+'</div>';
-      $('upd').textContent='加载失败';
     });
 }
 
 $('rf').onclick=function(){load(false)};
 window.addEventListener('hashchange',tab);
+fetch('name_map.json').then(function(r){return r.json()}).then(function(d){NAMES=d||{}; if(D) render(D);}).catch(function(){});
 tab(); load(true); loadSet();
 setInterval(function(){
   if(document.visibilityState==='visible' && Date.now()-LAST>45000) load(true);
@@ -337,7 +367,7 @@ function renderSet(){
              'placeholder="输入6位代码" value="'+p.code+'" '+
              'style="flex:1;background:#16233a;border:1px solid #22304d;border-radius:8px;'+
              'padding:8px 10px;color:#e8eef7;font-size:14px;font-weight:600;outline:none">'+
-           '<span style="font-size:13px;color:#8ab4ff;white-space:nowrap">'+(p.name||'')+'</span>'+
+           '<span style="font-size:13px;color:#8ab4ff;white-space:nowrap">'+(p.name||NAMES[p.code]||'')+'</span>'+
            '<button data-del="'+i+'" style="background:none;border:none;color:#a0565c;font-size:12px;white-space:nowrap">删除</button>'+
          '</div>'+
          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
@@ -371,6 +401,7 @@ function bindSet(){
             .then(function(j){
               if(j.name){
                 SET.positions[i].name=j.name;
+                NAMES[SET.positions[i].code]=j.name;
                 var nm=$('pset-list').querySelectorAll('[data-f="code"]')[i]
                          .parentNode.querySelector('span');
                 if(nm) nm.textContent=j.name;
@@ -455,7 +486,216 @@ function loadSet(){
     .catch(function(){renderSet();});
 }
 
-if('serviceWorker' in navigator){
+/* ============ GitHub 云端操作 ============ */
+var GH = {
+  token: localStorage.getItem('gh_token') || '',
+  owner: 'zjy9108',
+  repo: 'tapewatch',
+  get ok(){ return !!this.token; }
+};
+
+function ghMsg(txt, cls){
+  var el = document.getElementById('gh-msg');
+  if(el){ el.textContent = txt; el.style.color = cls==='err' ? '#ff9b9b' : (cls==='ok' ? '#6ee7a0' : '#6b7c96'); }
+}
+
+function ghStatus(){
+  var el = document.getElementById('gh-status');
+  var ts = parseInt(localStorage.getItem('gh_token_ts') || '0', 10);
+  var extra = '';
+  if(GH.ok && ts){
+    var days = 90 - Math.floor((Date.now() - ts) / 86400000);
+    if(days <= 0){
+      extra = '（已过期）';
+      el && (el.style.color = '#ff6b6b');
+    }else if(days <= 7){
+      extra = '（剩 ' + days + ' 天，快到期）';
+      el && (el.style.color = '#f2c368');
+    }else{
+      extra = '（剩 ' + days + ' 天）';
+      el && (el.style.color = '#6ee7a0');
+    }
+  }
+  if(el) el.textContent = GH.ok ? '已连接 ✓' + extra : '未连接';
+  var inp = document.getElementById('gh-token');
+  if(inp && GH.ok) inp.value = '••••••••（已保存）';
+  var exp = document.getElementById('gh-expiry');
+  if(exp){
+    if(GH.ok && ts){
+      var d2 = 90 - Math.floor((Date.now() - ts) / 86400000);
+      var dt = new Date(ts + 90*86400000);
+      exp.textContent = '有效期至 ' + dt.getFullYear() + '-' +
+        ('0'+(dt.getMonth()+1)).slice(-2) + '-' + ('0'+dt.getDate()).slice(-2) +
+        '，剩余 ' + Math.max(0, d2) + ' 天' + (d2 <= 7 ? '　⚠ 即将到期，请提前重新生成' : '');
+      exp.style.color = d2 <= 7 ? '#f2c368' : '#4a5a75';
+    }else{
+      exp.textContent = '';
+    }
+  }
+}
+
+function b64decodeUnicode(str){
+  try{
+    return decodeURIComponent(Array.prototype.map.call(atob(str.replace(/\n/g,'')),
+      function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)}).join(''));
+  }catch(e){ return ''; }
+}
+function b64encodeUnicode(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+function ghFetch(url, opts, retries){
+  retries = retries === undefined ? 3 : retries;
+  return fetch(url, opts).then(function(r){
+    return r.text().then(function(txt){
+      var d;
+      try{
+        d = txt ? JSON.parse(txt) : {};
+      }catch(e){
+        // 返回的不是 JSON（很可能是运营商劫持或网络错误页）
+        throw {_retryable:true, msg:'网络返回异常（可能被拦截），请换 WiFi/移动数据重试'};
+      }
+      if(r.status === 401) throw {msg:'Token 无效或已过期，请重新生成'};
+      if(r.status === 403) throw {msg:'Token 权限不足（需勾选 repo 和 workflow）'};
+      if(r.status === 404) return {_notfound:true};
+      if(!r.ok) throw {_retryable:r.status>=500, msg:'HTTP '+r.status+' '+(d.message||'')};
+      return d;
+    });
+  }).catch(function(e){
+    if(e && e._retryable && retries > 0){
+      return new Promise(function(res){ setTimeout(res, 1200); })
+        .then(function(){ return ghFetch(url, opts, retries-1); });
+    }
+    throw new Error((e && e.msg) ? e.msg : '网络错误，请检查连接');
+  });
+}
+
+function ghApi(path, method, body){
+  if(!GH.ok) return Promise.reject(new Error('未连接 GitHub'));
+  var url = 'https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path;
+  var opts = {
+    method: method || 'GET',
+    headers: {
+      'Authorization': 'token ' + GH.token,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  };
+  return ghFetch(url, opts, 3).then(function(d){
+    return (d && d._notfound) ? null : d;
+  });
+}
+
+/* --- 连接 / 断开 --- */
+document.getElementById('gh-connect').onclick = function(){
+  var v = document.getElementById('gh-token').value.trim();
+  if(!v || v.indexOf('ghp_') !== 0){ ghMsg('Token 格式不对，应以 ghp_ 开头', 'err'); return; }
+  ghMsg('验证中…');
+  GH.token = v;
+  ghApi('/actions/workflows').then(function(){
+    localStorage.setItem('gh_token', v);
+    if(!localStorage.getItem('gh_token_ts')) localStorage.setItem('gh_token_ts', String(Date.now()));
+    ghStatus();
+    ghMsg('连接成功，可以操作了', 'ok');
+  }).catch(function(e){
+    GH.token = '';
+    ghMsg(e.message, 'err');
+  });
+};
+document.getElementById('gh-disconnect').onclick = function(){
+  GH.token = '';
+  localStorage.removeItem('gh_token');
+  localStorage.removeItem('gh_token_ts');
+  ghStatus();
+  ghMsg('已断开');
+};
+
+/* --- 立即更新 --- */
+document.getElementById('btn-update').onclick = function(){
+  var btn = this;
+  if(!GH.ok){ alert('请先到「设置 → 云端连接」填 Token'); location.hash = '#set'; return; }
+  btn.textContent = '触发中…'; btn.disabled = true;
+  ghApi('/actions/workflows/daily.yml/dispatches', 'POST', {ref: 'main'})
+    .then(function(){
+      btn.textContent = '已触发，约 2 分钟';
+      setTimeout(function(){ btn.textContent = '立即更新云端数据'; btn.disabled = false; }, 4000);
+    })
+    .catch(function(e){
+      alert('触发失败：' + e.message);
+      btn.textContent = '立即更新云端数据'; btn.disabled = false;
+    });
+};
+
+/* --- 读云端状态并写回 --- */
+function loadCloudState(){
+  return ghApi('/contents/swing_state.json').then(function(d){
+    if(!d) return {capital: 20000, positions: [], _sha: null};
+    var st = JSON.parse(b64decodeUnicode(d.content));
+    var rows = [];
+    for(var code in (st.positions || {})){
+      var v = st.positions[code];
+      rows.push({code: code, name: NAMES[code] || '', entry: v.entry || 0,
+                 shares: v.shares || 0, date: v.date || '', last: v.last || v.entry || 0});
+    }
+    return {capital: st.capital || 20000, positions: rows, _sha: d.sha};
+  });
+}
+
+function saveCloudState(state, msg){
+  var cap = state.capital || 20000;
+  var pos = {};
+  (state.positions || []).forEach(function(r){
+    if(!r.code || !r.entry || !r.shares) return;
+    pos[r.code] = {
+      entry: r.entry, shares: r.shares,
+      w: +(r.entry * r.shares / cap).toFixed(4),
+      date: r.date || new Date().toISOString().slice(0,10),
+      pnl: 0, last: r.last || r.entry
+    };
+  });
+  var body = {capital: cap, positions: pos};
+  return ghApi('/contents/swing_state.json').then(function(d){
+    return ghApi('/contents/swing_state.json', 'PUT', {
+      message: msg || '更新持仓',
+      content: b64encodeUnicode(JSON.stringify(body, null, 2)),
+      sha: d ? d.sha : undefined
+    });
+  });
+}
+
+/* --- 候选一键买入 --- */
+function buyCandidate(code, px){
+  if(!GH.ok){ alert('请先到「设置 → 云端连接」填 Token'); location.hash = '#set'; return; }
+  var sh = prompt((NAMES[code] || code) + ' 现价 ' + px + '\n\n请输入买入股数（100 的整数倍）：', '100');
+  if(sh === null) return;
+  sh = parseInt(sh, 10);
+  if(!sh || sh <= 0 || sh % 100 !== 0){ alert('股数必须是 100 的整数倍'); return; }
+  loadCloudState().then(function(st){
+    st.positions.push({code: code, name: NAMES[code] || '', entry: px,
+                       shares: sh, date: new Date().toISOString().slice(0,10), last: px});
+    return saveCloudState(st, '买入 ' + (NAMES[code] || code));
+  }).then(function(){
+    alert('已加入持仓，下次云端更新会带上');
+    load(true);
+  }).catch(function(e){ alert('失败：' + e.message); });
+}
+
+/* --- 持仓同步到云端 --- */
+function syncPositions(){
+  if(!GH.ok){ alert('请先连接 GitHub'); location.hash = '#set'; return; }
+  if(!confirm('把当前持仓（' + SET.positions.length + ' 只）同步到云端？\n会覆盖云端持仓，并触发一次更新。')) return;
+  saveCloudState(SET, '同步持仓').then(function(){
+    return ghApi('/actions/workflows/daily.yml/dispatches', 'POST', {ref: 'main'});
+  }).then(function(){
+    alert('已同步并触发更新，约 2 分钟生效');
+  }).catch(function(e){ alert('失败：' + e.message); });
+}
+
+document.getElementById('sync-btn').onclick = syncPositions;
+ghStatus();
+
+if('serviceWorker'  in navigator){
   navigator.serviceWorker.register('/sw.js').catch(function(){});
 }
 </script>
