@@ -332,9 +332,7 @@ function load(quiet){
   fetch('result.json?_='+Date.now(),{cache:'no-store'})
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
     .then(function(d){render(d); $('upd').textContent='数据 '+(d.updated||'').slice(5,16);})
-    .catch(function(e){
-      $('errbox').innerHTML='<div class="err">数据加载失败：'+e.message+'</div>';
-    });
+    .catch(function(e){ $('errbox').innerHTML='<div class="err">数据加载失败：'+e.message+'</div>'; });
 }
 
 $('rf').onclick=function(){load(false)};
@@ -481,9 +479,18 @@ document.getElementById('save-btn').onclick=function(){
 
 function loadSet(){
   fetch('/api/settings?_='+Date.now(),{cache:'no-store'})
-    .then(function(r){return r.json()})
+    .then(function(r){ if(!r.ok) throw new Error('no local'); return r.json(); })
     .then(function(d){SET=d; renderSet();})
-    .catch(function(){renderSet();});
+    .catch(function(){
+      if(window.GH && GH.ok){
+        loadCloudState().then(function(d){
+          SET = {capital: d.capital, positions: d.positions};
+          renderSet();
+        }).catch(function(){ renderSet(); });
+      }else{
+        renderSet();
+      }
+    });
 }
 
 /* ============ GitHub 云端操作 ============ */
