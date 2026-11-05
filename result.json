@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-05 02:25:20",
+  "updated": "2026-11-05 02:29:42",
   "market": {
     "state": "bear",
-    "px": 6.845,
+    "px": 6.841,
     "ma20": 6.768,
     "ma60": 7.455,
     "vol_q": 92.0,
@@ -10,27 +10,42 @@
     "adj": 0.04,
     "date": "2026-11-05"
   },
-  "positions": [],
-  "candidates": [
+  "positions": [
     {
       "code": "000530",
       "name": "冰山冷热",
-      "rank": 1,
-      "px": 9.17,
-      "mom": 74.3,
-      "vol": 3.92,
-      "style": "周期",
-      "held": false
+      "last": 9.22,
+      "pnl": 7.2,
+      "style": "周期"
     },
     {
       "code": "002086",
       "name": "东方海洋",
+      "last": 3.55,
+      "pnl": 3.8,
+      "style": "防御"
+    }
+  ],
+  "candidates": [
+    {
+      "code": "000530",
+      "name": "冰山冷热",
       "rank": 2,
-      "px": 3.48,
-      "mom": 73.1,
-      "vol": 3.77,
+      "px": 9.22,
+      "mom": 75.3,
+      "vol": 3.91,
+      "style": "周期",
+      "held": true
+    },
+    {
+      "code": "002086",
+      "name": "东方海洋",
+      "rank": 1,
+      "px": 3.55,
+      "mom": 76.6,
+      "vol": 3.81,
       "style": "防御",
-      "held": false
+      "held": true
     }
   ],
   "capital": 20000.0,
